@@ -25,4 +25,9 @@ body {
   width: 80%;
 }
 
+.deleteButton {
+  width: 50px;
+  height: 30px;
+}
+
 /*# sourceMappingURL=main.css.map */
