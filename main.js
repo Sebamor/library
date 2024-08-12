@@ -21,13 +21,13 @@ function displayBooks(array) {
     const bookList = document.getElementById('bookList');
     library.forEach((book) => {
         let li = document.createElement('li');
-        li.innerHTML = `Title: ${book.title}, Author: ${book.author}, Genre: ${book.genre}, Pages: ${book.pages}, Read: ${book.read}`;
+        li.innerHTML = `<strong>Title:</strong> ${book.title}, <strong>Author:</strong> ${book.author}, <strong>Genre:</strong> ${book.genre}, <strong>Pages:</strong> ${book.pages}, <strong>Read:<strong> ${book.read}`;
 
         if (book.read === true) {
-            li.innerHTML = `Title: ${book.title}, Author: ${book.author}, Genre: ${book.genre}, Pages: ${book.pages}, Read: &check;`;
+            li.innerHTML = `<strong>Title:</strong> ${book.title}, <strong>Author:</strong> ${book.author}, <strong>Genre:</strong> ${book.genre}, <strong>Pages:</strong> ${book.pages}, <strong>Read:<strong> &check;`;
         }
         else {
-            li.innerHTML = `Title: ${book.title}, Author: ${book.author}, Genre: ${book.genre}, Pages: ${book.pages}, Read: &times;`;
+            li.innerHTML = `<strong>Title:</strong> ${book.title}, <strong>Author:</strong> ${book.author}, <strong>Genre:</strong> ${book.genre}, <strong>Pages:</strong> ${book.pages}, <strong>Read:<strong> &times;`;
         }
 
         let toggleReadButton = document.createElement('button');
@@ -35,12 +35,12 @@ function displayBooks(array) {
         toggleReadButton.addEventListener('click', () => {
             book.read = !book.read;
             if (book.read === true) {
-                li.innerHTML = `Title: ${book.title}, Author: ${book.author}, Genre: ${book.genre}, Pages: ${book.pages}, Read: &check;`;
+                li.innerHTML = `<strong>Title:</strong> ${book.title}, <strong>Author:</strong> ${book.author}, <strong>Genre:</strong> ${book.genre}, <strong>Pages:</strong> ${book.pages}, <strong>Read:<strong> &check;`;
                 li.appendChild(toggleReadButton);
                 li.appendChild(deleteButton);
             }
             else {
-                li.innerHTML = `Title: ${book.title}, Author: ${book.author}, Genre: ${book.genre}, Pages: ${book.pages}, Read: &times;`;
+                li.innerHTML = `<strong>Title:</strong> ${book.title}, <strong>Author:</strong> ${book.author}, <strong>Genre:</strong> ${book.genre}, <strong>Pages:</strong> ${book.pages}, <strong>Read:<strong> &times;`;
                 li.appendChild(toggleReadButton);
                 li.appendChild(deleteButton);
             }
@@ -106,4 +106,4 @@ bookSubmitButton.addEventListener('click', (e) => {
     bookForm.reset();
 })
 
-addBook('Test Book', 'Test Author', 'Test Genre', 100, true);
+addBook('Sample Book', 'Sample Author', 'Sample Genre', 100, true);
