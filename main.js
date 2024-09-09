@@ -1,109 +1,126 @@
-const library = [];
+class Book {
+    constructor(title, author, genre, pages, read) {
+        this.title = title;
+        this.author = author;
+        this.genre = genre;
+        this.pages = pages;
+        this.read = read;
+    }
 
-// Book Functions
-function Book(title, author, genre, pages, read) {
-    this.title = title;
-    this.author = author;
-    this.genre = genre;
-    this.pages = pages;
-    this.read = read;
-}
+    toggleRead() {
+        this.read = !this.read;
+    }
 
-function addBook(title, author, genre, pages, read) {
-    deleteBookList();
+    getReadStatus() {
+        return this.read ? '&check;' : '&times;';
+    }
 
-    const newBook = new Book(title, author, genre, pages, read);
-    library.push(newBook);
-    displayBooks(library);
-}
-
-function displayBooks(array) {
-    const bookList = document.getElementById('bookList');
-    library.forEach((book) => {
-        let li = document.createElement('li');
-        li.innerHTML = `<strong>Title:</strong> ${book.title}, <strong>Author:</strong> ${book.author}, <strong>Genre:</strong> ${book.genre}, <strong>Pages:</strong> ${book.pages}, <strong>Read:<strong> ${book.read}`;
-
-        if (book.read === true) {
-            li.innerHTML = `<strong>Title:</strong> ${book.title}, <strong>Author:</strong> ${book.author}, <strong>Genre:</strong> ${book.genre}, <strong>Pages:</strong> ${book.pages}, <strong>Read:<strong> &check;`;
-        }
-        else {
-            li.innerHTML = `<strong>Title:</strong> ${book.title}, <strong>Author:</strong> ${book.author}, <strong>Genre:</strong> ${book.genre}, <strong>Pages:</strong> ${book.pages}, <strong>Read:<strong> &times;`;
-        }
-
-        let toggleReadButton = document.createElement('button');
+    toListItem() {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>Title:</strong> ${this.title}, <strong>Author:</strong> ${this.author}, <strong>Genre:</strong> ${this.genre}, <strong>Pages:</strong> ${this.pages}, <strong>Read:</strong> ${this.getReadStatus()}`;
+        
+        const toggleReadButton = document.createElement('button');
         toggleReadButton.textContent = 'Toggle';
         toggleReadButton.addEventListener('click', () => {
-            book.read = !book.read;
-            if (book.read === true) {
-                li.innerHTML = `<strong>Title:</strong> ${book.title}, <strong>Author:</strong> ${book.author}, <strong>Genre:</strong> ${book.genre}, <strong>Pages:</strong> ${book.pages}, <strong>Read:<strong> &check;`;
-                li.appendChild(toggleReadButton);
-                li.appendChild(deleteButton);
-            }
-            else {
-                li.innerHTML = `<strong>Title:</strong> ${book.title}, <strong>Author:</strong> ${book.author}, <strong>Genre:</strong> ${book.genre}, <strong>Pages:</strong> ${book.pages}, <strong>Read:<strong> &times;`;
-                li.appendChild(toggleReadButton);
-                li.appendChild(deleteButton);
-            }
+            this.toggleRead();
+            li.innerHTML = `<strong>Title:</strong> ${this.title}, <strong>Author:</strong> ${this.author}, <strong>Genre:</strong> ${this.genre}, <strong>Pages:</strong> ${this.pages}, <strong>Read:</strong> ${this.getReadStatus()}`;
+            li.appendChild(toggleReadButton);
+            li.appendChild(deleteButton);
         });
         li.appendChild(toggleReadButton);
 
-        let deleteButton = document.createElement('button');
+        const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Delete';
         deleteButton.className = 'deleteButton';
-        deleteButton.dataset.title = book.title;
+        deleteButton.dataset.title = this.title;
+        deleteButton.addEventListener('click', () => {
+            this.handleDelete();
+        });
+        li.appendChild(deleteButton);
 
-        deleteButton.addEventListener('click', (e) => {
-            const title = e.target.dataset.title;
-            const index = library.findIndex((book) => book.title === title);
-            if (index !== -1) {
-                library.splice(index, 1);
-                e.target.parentElement.remove();
+        return li;
+    }
+
+    handleDelete() {
+        library.removeBook(this.title);
+        const bookList = document.getElementById('bookList');
+        const listItem = Array.from(bookList.children).find(li => li.querySelector('.deleteButton').dataset.title === this.title);
+        if (listItem) {
+            bookList.removeChild(listItem);
+        }
+    }
+}
+
+
+
+
+
+
+class Library {
+    constructor() {
+        this.books = [];
+        this.bookList = document.getElementById('bookList');
+        this.modal = document.getElementById('bookModal');
+        this.bookForm = document.getElementById('bookForm');
+        this.newBookButton = document.getElementById('bookButton');
+        this.closeButton = document.getElementsByClassName('closeModal')[0];
+        this.bookSubmitButton = document.getElementById('addBookSubmit');
+        this.initEventListeners();
+    }
+
+    initEventListeners() {
+        this.newBookButton.addEventListener('click', () => {
+            this.modal.style.display = 'block';
+        });
+
+        this.closeButton.addEventListener('click', () => {
+            this.modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === this.modal) {
+                this.modal.style.display = 'none';
             }
         });
 
-        li.appendChild(deleteButton);
-        bookList.appendChild(li);
-    })
-}
+        this.bookSubmitButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.addBook(
+                document.getElementById('bookTitle').value,
+                document.getElementById('bookAuthor').value,
+                document.getElementById('bookGenre').value,
+                document.getElementById('bookPages').value,
+                document.getElementById('bookRead').checked
+            );
+            this.modal.style.display = 'none';
+            this.bookForm.reset();
+        });
+    }
 
-function deleteBookList() {
-    const bookList = document.getElementById('bookList');
-    while (bookList.firstChild) {
-        bookList.removeChild(bookList.firstChild);
+    addBook(title, author, genre, pages, read) {
+        const newBook = new Book(title, author, genre, pages, read);
+        this.books.push(newBook);
+        this.displayBooks();
+    }
+
+    removeBook(title) {
+        this.books = this.books.filter(book => book.title !== title);
+    }
+
+    displayBooks() {
+        this.deleteBookList();
+        this.books.forEach(book => {
+            const listItem = book.toListItem();
+            this.bookList.appendChild(listItem);
+        });
+    }
+
+    deleteBookList() {
+        while (this.bookList.firstChild) {
+            this.bookList.removeChild(this.bookList.firstChild);
+        }
     }
 }
 
-
-// Modal Functions
-const newBookButton = document.getElementById('bookButton');
-const modal = document.getElementById('bookModal');
-const closeButton = document.getElementsByClassName('closeModal')[0];
-
-newBookButton.addEventListener('click', () => {
-    modal.style.display = 'block';
-})
-closeButton.addEventListener('click', () => {
-    modal.style.display = 'none';
-})
-window.addEventListener('click', (event) => {
-    if (event.target == modal) {
-        modal.style.display = 'none';
-    }
-})
-
-// Form functions
-const bookForm = document.getElementById('bookForm');
-const bookSubmitButton = document.getElementById('addBookSubmit');
-const nTitle = document.getElementById('bookTitle');
-const nAuthor = document.getElementById('bookAuthor');
-const nGenre = document.getElementById('bookGenre');
-const nPages = document.getElementById('bookPages');
-const nRead = document.getElementById('bookRead');
-bookSubmitButton.addEventListener('click', (e) => {
-    e.preventDefault();
-    addBook(nTitle.value, nAuthor.value, nGenre.value, nPages.value, nRead.checked);
-    modal.style.display = 'none';
-    bookForm.reset();
-})
-
-addBook('Sample Book', 'Sample Author', 'Sample Genre', 100, true);
+const library = new Library();
+library.addBook('Sample Book', 'Sample Author', 'Sample Genre', 100, true);
